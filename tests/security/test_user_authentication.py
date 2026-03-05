@@ -3,8 +3,8 @@ from fastapi import HTTPException
 from uuid import UUID, uuid4
 from unittest.mock import MagicMock
 from fastapi import Request
-from src.security.interface.fastapi.auth import user_authentication
-from src.security.domain import ExpiredToken, InvalidToken
+from src.security.fastapi.auth import user_authentication
+from src.security.exceptions import ExpiredToken, InvalidToken
 
 @pytest.fixture
 def mock_injector():

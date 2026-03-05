@@ -2,8 +2,9 @@ import pytest
 from uuid import uuid4
 from datetime import datetime
 from unittest.mock import AsyncMock, Mock
-from src.features.users.application import UserLogin
-from src.features.users.domain import UserPublic, User
+from src.features.users.login.use_case import UserLogin
+from src.features.users.models import User
+from src.features.users.schemas import UserPublic
 from src.persistance import ResourceNotFoundException
 from src.security import IncorrectPassword
 

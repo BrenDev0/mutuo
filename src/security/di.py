@@ -1,16 +1,16 @@
 from src.di.injector import Injector
-from .domain.services import (
-    encryption,
-    hashing,
-    web_token
+from .services import (
+    EncryptionService,
+    HashingService,
+    WebTokenService
 )
 
-from .infrastructure import BcryptHashingService
-from .infrastructure.fernet.encryption import FernetEncryptionService
-from .infrastructure.jwt.web_token import JwtWebTokenService
+from .bcrypt.hashing import BcryptHashingService
+from .fernet.encryption import FernetEncryptionService
+from .jwt.web_token import JwtWebTokenService
 
 def register_dependencies(injector: Injector):
-    injector.register(encryption.EncryptionService, FernetEncryptionService)
-    injector.register(hashing.HashingService, BcryptHashingService)
-    injector.register(web_token.WebTokenService, JwtWebTokenService)
+    injector.register(EncryptionService, FernetEncryptionService)
+    injector.register(HashingService, BcryptHashingService)
+    injector.register(WebTokenService, JwtWebTokenService)
     

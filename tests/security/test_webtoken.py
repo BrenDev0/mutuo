@@ -1,8 +1,8 @@
 import pytest
 import jwt
 import time
-from src.security.infrastructure.jwt.web_token import JwtWebTokenService
-from src.security.domain import ExpiredToken, InvalidToken
+from src.security.jwt.web_token import JwtWebTokenService
+from src.security.exceptions import ExpiredToken, InvalidToken
 
 @pytest.fixture
 def token_service(monkeypatch):

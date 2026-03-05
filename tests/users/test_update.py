@@ -2,8 +2,10 @@ import pytest
 from uuid import uuid4
 from datetime import datetime
 from unittest.mock import AsyncMock, Mock
-from src.features.users.application import UpdateUser
-from src.features.users.domain import UserPublic, User, UpdateUserRequest
+from src.features.users.update.use_case import UpdateUser
+from src.features.users.update.schemas import UpdateUserRequest
+from src.features.users.models import User
+from src.features.users.schemas import UserPublic
 
 
 @pytest.fixture

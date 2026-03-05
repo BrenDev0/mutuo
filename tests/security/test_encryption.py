@@ -1,6 +1,6 @@
 import pytest
 from cryptography.fernet import Fernet
-from src.security.infrastructure.fernet.encryption import FernetEncryptionService
+from src.security.fernet.encryption import FernetEncryptionService
 
 @pytest.fixture
 def encryption_service(monkeypatch):

@@ -2,9 +2,10 @@ import pytest
 from unittest.mock import Mock, AsyncMock
 from datetime import datetime
 from uuid import uuid4
-from src.features.users.application.use_cases.delete import DeleteUser
-from src.features.users.application import UsersService
-from src.features.users.domain import entities, schemas
+from src.features.users.delete.use_case import DeleteUser
+from src.features.users.services import UsersService
+from src.features.users.models import User
+from src.features.users.schemas import UserPublic
 from src.persistance import ResourceNotFoundException
 
 
@@ -37,7 +38,7 @@ async def test_delete_user_success(
 ):
     user_id = uuid4()
     
-    fake_deleted_user = entities.User(
+    fake_deleted_user = User(
         user_id=user_id,
         name="encrypted",
         phone="encrypted",
@@ -49,7 +50,7 @@ async def test_delete_user_success(
         created_at=datetime.now()
     )
 
-    fake_public_schema = schemas.UserPublic(
+    fake_public_schema = UserPublic(
         user_id=user_id,
         name="decrypted",
         phone="decrypted",
@@ -106,7 +107,7 @@ async def test_delete_user_repository_error(
 ):
     user_id = uuid4()
     
-    fake_user = entities.User(
+    fake_user = User(
         user_id=user_id,
         name="encrypted",
         phone="encrypted",

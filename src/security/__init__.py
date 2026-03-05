@@ -1,42 +1,34 @@
-"""
-structure:
-- Domain: Abstract interfaces and exceptions
-- Infrastructure: Framework implementations 
-- Di registry
-"""
-
 __version__ = "1.0.0"
 __author__ = "BrenDev0"
 __description__ = "Security package for app"
 
-from .domain import (
+from .exceptions import (
     HMACException, 
     IncorrectPassword, 
     InvalidToken, 
     ExpiredToken, 
-    PermissionsException,
+    PermissionsException
+)
+
+
+from .services import (
     EncryptionService,
     HashingService,
     WebTokenService
 )
 
-from .infrastructure import (
-    FernetEncryptionService,
-    BcryptHashingService,
-    JwtWebTokenService
-)
+from .bcrypt.hashing import BcryptHashingService
+from .fernet.encryption import FernetEncryptionService
+from .jwt.web_token import JwtWebTokenService
 
-from .interface import (
-    user_authentication,
-    user_verification,
-    verify_hmac
-)
+from .fastapi.auth import user_authentication
+from .fastapi.verify import user_verification
+from .fastapi.hmac import verify_hmac
 
 from .utils import get_random_code
 
 
 __all__ = [
-    #### Domain ####
     "HMACException",
     "IncorrectPassword",
     "InvalidToken",
@@ -47,17 +39,13 @@ __all__ = [
     "HashingService",
     "WebTokenService",
 
-
-    #### Infrastructure ####
     "FernetEncryptionService",
     "BcryptHashingService",
     "JwtWebTokenService",
 
-    #### Interface ####
     "user_authentication",
     "verify_hmac",
     "user_verification",
 
-    #### utils #### 
     "get_random_code",
 ]

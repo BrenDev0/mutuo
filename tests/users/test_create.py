@@ -2,9 +2,12 @@ import pytest
 from unittest.mock import Mock, AsyncMock
 from datetime import datetime
 from uuid import uuid4
-from src.features.users.application.use_cases.create import CreateUser
-from src.features.users.application import UsersService
-from src.features.users.domain import entities, schemas
+from src.features.users.create.use_case import CreateUser
+from src.features.users.create.schemas import CreateUserRequest
+from src.features.users.services import UsersService
+from src.features.users.models import User
+from src.features.users.schemas import UserPublic
+
 from src.security import PermissionsException
 
 
@@ -36,7 +39,7 @@ async def test_success(
     user_id = uuid4()
     verification_code = 123456
     
-    fake_user = entities.User(
+    fake_user = User(
         user_id=user_id,
         name="encrypted",
         phone="encrypted",
@@ -48,7 +51,7 @@ async def test_success(
         created_at=datetime.now()
     )
 
-    fake_request_data = schemas.CreateUserRequest(
+    fake_request_data = CreateUserRequest(
         verification_code=verification_code,
         name="name",
         phone="phone",
@@ -56,7 +59,7 @@ async def test_success(
         password="password"
     )
 
-    fake_public_schema = schemas.UserPublic(
+    fake_public_schema = UserPublic(
         user_id=user_id,
         name="decrypted",
         phone="decrypted",
@@ -65,7 +68,7 @@ async def test_success(
         created_at=datetime.now()
     )
 
-    mock_users_service.prepare_new_user_data.return_value = entities.User(
+    mock_users_service.prepare_new_user_data.return_value = User(
         name="encrypted",
         phone="encrypted",
         email="hashed",
@@ -108,7 +111,7 @@ async def test_verification_code_mismatch(
 ):
     """Test that mismatched verification codes raise PermissionsException."""
     
-    fake_request_data = schemas.CreateUserRequest(
+    fake_request_data = CreateUserRequest(
         verification_code=999999,  # Different from what we pass
         name="name",
         phone="phone",
