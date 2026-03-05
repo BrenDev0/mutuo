@@ -1,5 +1,4 @@
 import pytest
-import json
 from fastapi import HTTPException
 from uuid import UUID, uuid4
 from unittest.mock import MagicMock, AsyncMock

@@ -63,7 +63,7 @@ class VerifyEmail:
     async def execute(
         self,
         to: str
-    ) -> str:
+    ):
         """
         Execute the use case 
 

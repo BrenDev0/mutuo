@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends, Body, Response
+from fastapi import APIRouter, Depends, Body, Response
 from src.di import Injector, get_injector
 from ..schemas  import UserPublic
 from .schemas import CreateUserRequest, CreateUserResult
@@ -18,11 +18,13 @@ async def create_user(
     """
     Create user 
 
-    verification code must come from users email 
+    Verification code must come from users email 
 
-    raises:
-        429: if max atteps have been reached must request new code to try again
-        401: if verification fails 
+    Raises:
+    
+    &emsp;429: If max attempts have been reached, must request new code to try again
+    
+    &emsp;401: If verification fails 
 
     """
     use_case: CreateUser = injector.inject(CreateUser)  

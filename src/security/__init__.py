@@ -22,7 +22,6 @@ from .fernet.encryption import FernetEncryptionService
 from .jwt.web_token import JwtWebTokenService
 
 from .fastapi.auth import user_authentication
-from .fastapi.verify import user_verification
 from .fastapi.hmac import verify_hmac
 
 from .utils import get_random_code
@@ -45,7 +44,6 @@ __all__ = [
 
     "user_authentication",
     "verify_hmac",
-    "user_verification",
 
     "get_random_code",
 ]
