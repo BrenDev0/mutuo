@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, AsyncMock
+from unittest.mock import Mock, AsyncMock, patch
 from datetime import datetime
 from uuid import uuid4
 from src.features.users.delete.use_case import DeleteUser
@@ -31,7 +31,9 @@ def use_case(
 
 
 @pytest.mark.asyncio
+@patch('src.features.users.delete.use_case.require_resource_exists')
 async def test_delete_user_success(
+    mock_require_exists,
     mock_users_repository,
     mock_users_service: UsersService,
     use_case: DeleteUser
@@ -46,7 +48,6 @@ async def test_delete_user_success(
         email_hash="hashed",
         profile_type="OWNER",
         password="hashed",
-        last_login=datetime.now(),
         created_at=datetime.now()
     )
 
@@ -59,19 +60,26 @@ async def test_delete_user_success(
         created_at=datetime.now()
     )
 
-    mock_users_repository.select_one.return_value = fake_deleted_user
+    mock_require_exists.return_value = fake_deleted_user
     mock_users_repository.delete_one.return_value = fake_deleted_user
     mock_users_service.get_public_schema.return_value = fake_public_schema
 
     result = await use_case.execute(user_id=user_id)
 
-    mock_users_repository.select_one.assert_called_once_with("user_id", user_id)
+    mock_require_exists.assert_called_once_with(
+        repository=mock_users_repository,
+        key="user_id",
+        value=user_id
+    )
+    
     mock_users_repository.delete_one.assert_called_once_with(
         key="user_id",
         value=user_id
     )
+    
     mock_users_service.get_public_schema.assert_called_once_with(entity=fake_deleted_user)
 
+    assert isinstance(result, UserPublic)
     assert result.user_id == user_id
     assert result.name == "decrypted"
     assert result.phone == "decrypted"
@@ -80,27 +88,38 @@ async def test_delete_user_success(
 
 
 @pytest.mark.asyncio
+@patch('src.features.users.delete.use_case.require_resource_exists')
 async def test_delete_user_not_found(
+    mock_require_exists,
     mock_users_repository,
     mock_users_service: UsersService,
     use_case: DeleteUser
 ):
     user_id = uuid4()
 
-    mock_users_repository.select_one.return_value = None
+    mock_require_exists.side_effect = ResourceNotFoundException(
+        detail=f"Resource with user_id: {user_id} not found"
+    )
 
     with pytest.raises(ResourceNotFoundException) as exc_info:
         await use_case.execute(user_id=user_id)
     
     assert f"Resource with user_id: {user_id} not found" in str(exc_info.value)
     
-    mock_users_repository.select_one.assert_called_once_with("user_id", user_id)
+    mock_require_exists.assert_called_once_with(
+        repository=mock_users_repository,
+        key="user_id",
+        value=user_id
+    )
+    
     mock_users_repository.delete_one.assert_not_called()
     mock_users_service.get_public_schema.assert_not_called()
 
 
 @pytest.mark.asyncio
+@patch('src.features.users.delete.use_case.require_resource_exists')
 async def test_delete_user_repository_error(
+    mock_require_exists,
     mock_users_repository,
     mock_users_service: UsersService,
     use_case: DeleteUser
@@ -115,11 +134,10 @@ async def test_delete_user_repository_error(
         email_hash="hashed",
         profile_type="OWNER",
         password="hashed",
-        last_login=datetime.now(),
         created_at=datetime.now()
     )
 
-    mock_users_repository.select_one.return_value = fake_user
+    mock_require_exists.return_value = fake_user
     mock_users_repository.delete_one.side_effect = Exception("Database error")
 
     with pytest.raises(Exception) as exc_info:
@@ -127,8 +145,15 @@ async def test_delete_user_repository_error(
     
     assert "Database error" in str(exc_info.value)
     
+    mock_require_exists.assert_called_once_with(
+        repository=mock_users_repository,
+        key="user_id",
+        value=user_id
+    )
+    
     mock_users_repository.delete_one.assert_called_once_with(
         key="user_id",
         value=user_id
     )
+    
     mock_users_service.get_public_schema.assert_not_called()

@@ -5,8 +5,9 @@ __description__ = "persistance package for app"
 from .exceptions import ResourceNotFoundException, CollisionException
 from .repositories import AsyncDataRepository, AsyncSessionRepository
 
-from .services import (
-    ResourceExistsService
+from .utils import (
+    require_resource_exists,
+    resource_exists
 )
 
 from .sqlalchemy.setup import (
@@ -24,7 +25,8 @@ __all__ = [
     "CollisionException",
 
 
-    "ResourceExistsService",
+    "resource_exists",
+    "require_resource_exists",
     
     "AsyncRedisSessionRepository",
     "AsyncSqlAlchemyDataRepository",

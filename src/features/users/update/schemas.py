@@ -1,7 +1,7 @@
+from pydantic import BaseModel
 from typing import Optional
-from ..schemas import UserConfig
 
 
-class UpdateUserRequest(UserConfig):
+class UpdateUserRequest(BaseModel):
     name: Optional[str] = None
     phone: Optional[str] = None

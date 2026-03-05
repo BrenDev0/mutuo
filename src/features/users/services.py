@@ -1,5 +1,6 @@
 from src.security import EncryptionService, HashingService
-from typing import cast
+from src.app import AppException
+from typing import cast, Any, Dict
 from uuid import UUID
 from datetime import datetime
 from .models import User
@@ -7,6 +8,7 @@ from .schemas import UserPublic
 from .repository import UserRepository
 from .rules import EmailAvailability
 from .create.schemas import CreateUserRequest
+from .update.schemas import UpdateUserRequest
 
 class UsersService:
     def __init__(
@@ -51,6 +53,27 @@ class UsersService:
         )
 
         return partial_entity
+    
+    def prepare_update_data(
+        self,
+        data: UpdateUserRequest
+    ) -> Dict[str, Any]:
+        model_dict = data.model_dump(exclude_none=True)
+
+        if not model_dict:
+            raise AppException(
+                detail="Request must include at least one non null field to update",
+                status_code=400
+            )
+        
+        encrypted_dict = {}
+
+        for key, value in model_dict.items():
+            encrypted_dict[key] = self.__encryption.encrypt(value)
+        
+        return encrypted_dict
+
+
 
 class EmailAvailabilityService(EmailAvailability):
     def __init__(
