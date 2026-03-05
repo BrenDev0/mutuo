@@ -1,6 +1,6 @@
 from src.di.injector import Injector
 from src.security.di import register_dependencies as security_dependencies
-from src.features.communications.di import register_dependencies as communications_dependencies
+from src.communications.di import register_dependencies as communications_dependencies
 
 from src.features.users.di import register_dependencies as users_dependencies
 

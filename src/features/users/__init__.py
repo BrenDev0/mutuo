@@ -10,10 +10,3 @@ Structure:
 __version__ = "1.0.0"
 __author__ = "BrenDev0"
 __description__ = "Users package for app"
-
-
-from .domain import UserRepository
-
-__all__ = [
-    "UserRepository"
-]

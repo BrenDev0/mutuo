@@ -2,8 +2,10 @@ import pytest
 from uuid import uuid4
 from datetime import datetime
 from unittest.mock import AsyncMock, Mock
-from src.features.users.application import UserLogin
-from src.features.users.domain import UserPublic, User
+from src.features.users.login.use_case import UserLogin
+from src.features.users.login.schemas import LoginResult
+from src.features.users.models import User
+from src.features.users.schemas import UserPublic
 from src.persistance import ResourceNotFoundException
 from src.security import IncorrectPassword
 
@@ -11,6 +13,9 @@ from src.security import IncorrectPassword
 def mock_repository():
     return AsyncMock()
 
+@pytest.fixture
+def mock_session_repository():
+    return AsyncMock()
 
 @pytest.fixture
 def mock_service():
@@ -23,21 +28,23 @@ def mock_hashing():
 @pytest.fixture
 def use_case(
     mock_repository,
+    mock_session_repository,
     mock_service,
     mock_hashing
 ):
     return UserLogin(
         users_repository=mock_repository,
+        session_repository=mock_session_repository,
         users_service=mock_service,
         hashing=mock_hashing
     )
-
 
 
 @pytest.mark.asyncio
 async def test_success(
     mock_hashing,
     mock_repository,
+    mock_session_repository,
     mock_service,
     use_case: UserLogin
 ):
@@ -67,12 +74,11 @@ async def test_success(
 
     result = await use_case.execute(
         email="email",
-        password="password"
+        password="password",
+        session_expiration=259200
     )
 
-    mock_hashing.hash_for_search.assert_called_once_with(
-        "email"
-    )
+    mock_hashing.hash_for_search.assert_called_once_with("email")
     mock_repository.select_one.assert_called_once_with(
         key="email_hash",
         value="hashed_for_search"
@@ -81,10 +87,11 @@ async def test_success(
         unhashed="password",
         hashed="hashed"
     )
-
-    assert isinstance(result, UserPublic)
-
-
+    mock_session_repository.set_session.assert_called_once()
+    
+    assert isinstance(result, LoginResult)
+    assert result.user_public == fake_public_schema
+    assert result.session_id is not None
 
 
 @pytest.mark.asyncio
@@ -93,29 +100,23 @@ async def test_not_found(
     mock_repository,
     use_case: UserLogin
 ):
-   
     mock_hashing.hash_for_search.return_value = "hashed_for_search"
     mock_repository.select_one.return_value = None
 
     with pytest.raises(ResourceNotFoundException) as exc_info:
-
         await use_case.execute(
             email="email",
-            password="password"
+            password="password",
+            session_expiration=259200
         )
 
-    mock_hashing.hash_for_search.assert_called_once_with(
-        "email"
-    )
+    mock_hashing.hash_for_search.assert_called_once_with("email")
     mock_repository.select_one.assert_called_once_with(
         key="email_hash",
         value="hashed_for_search"
     )
 
     assert "Incorrect email" in str(exc_info.value.detail)
-
-
-
 
 
 @pytest.mark.asyncio
@@ -142,12 +143,11 @@ async def test_incorrect_password(
     with pytest.raises(IncorrectPassword) as exc_info:
         await use_case.execute(
             email="email",
-            password="wrong_password"
+            password="wrong_password",
+            session_expiration=259200
         )
 
-    mock_hashing.hash_for_search.assert_called_once_with(
-        "email"
-    )
+    mock_hashing.hash_for_search.assert_called_once_with("email")
     mock_repository.select_one.assert_called_once_with(
         key="email_hash",
         value="hashed_for_search"
@@ -158,4 +158,3 @@ async def test_incorrect_password(
     )
 
     assert "Incorrect email or password" in str(exc_info.value.detail)
-

@@ -1,4 +1,4 @@
-from .domain import AppException
+from .exceptions import AppException
 
 __all__ = [
     "AppException"

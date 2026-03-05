@@ -1,15 +1,13 @@
 from src.di import Injector
-from src.features.communications import EmailAvailability
-from .domain import UserRepository
-from .infrastructure import SqlAlchemyUserRepository
-from .application import UsersService
-from .application import (
-    CreateUser,
-    UpdateUser,
-    UserLogin,
-    DeleteUser,
-    EmailAvailabilityService
-)
+from .repository import UserRepository
+from .rules import EmailAvailability
+from .sqlalchemy.users_repository import SqlAlchemyUserRepository
+from .create.use_case import CreateUser
+from .delete.use_case import DeleteUser
+from .update.use_case import UpdateUser
+from .login.use_case import UserLogin
+from .services import UsersService, EmailAvailabilityService
+
 
 def register_dependencies(injector: Injector):
     injector.register(UserRepository, SqlAlchemyUserRepository)

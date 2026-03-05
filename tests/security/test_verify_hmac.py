@@ -4,7 +4,7 @@ import hashlib
 import time
 from fastapi import HTTPException, Request
 from unittest.mock import AsyncMock
-from src.security.interface.fastapi.hmac import verify_hmac
+from src.security.fastapi.hmac import verify_hmac
 
 @pytest.fixture
 def mock_request():

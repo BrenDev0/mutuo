@@ -1,5 +1,5 @@
 import pytest
-from src.security.infrastructure.bcrypt.hashing import BcryptHashingService
+from src.security.bcrypt.hashing import BcryptHashingService
 
 @pytest.fixture
 def hashing_service():

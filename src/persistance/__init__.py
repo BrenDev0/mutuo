@@ -1,43 +1,34 @@
-"""
-Structure:
-- Domain: Abstract interfaces, schemas, entities and models
-- Infrastructure: Framework implementations 
-- Application: Domain applications (use cases, rules)
-- Di registry
-"""
-
 __version__ = "1.0.0"
 __author__ = "BrenDev0"
 __description__ = "persistance package for app"
 
-from .domain import (
-    ResourceNotFoundException,
-    AsyncDataRepository,
-    CollisionException
+from .exceptions import ResourceNotFoundException, CollisionException
+from .repositories import AsyncDataRepository, AsyncSessionRepository
+
+from .utils import (
+    require_resource_exists,
+    resource_exists
 )
 
-from .application import (
-    ResourceExists
-)
-
-from .infrastructure import (
-    AsyncSqlAlchemyDataRepository,
+from .sqlalchemy.setup import (
     SqlAlchemyBase,
     get_async_session_factory,
     get_async_engine
 )
+from .sqlalchemy.async_data_repository import AsyncSqlAlchemyDataRepository
+from .redis.async_session_repository import AsyncRedisSessionRepository
 
 __all__ = [
-    #### Domain ####
     "ResourceNotFoundException",
     "AsyncDataRepository",
+    "AsyncSessionRepository",
     "CollisionException",
 
 
-    #### Application ####
-    "ResourceExists",
-
-    #### Infrastructure ####
+    "resource_exists",
+    "require_resource_exists",
+    
+    "AsyncRedisSessionRepository",
     "AsyncSqlAlchemyDataRepository",
     "SqlAlchemyBase",
     "get_async_engine",
