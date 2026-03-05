@@ -1,4 +1,4 @@
-from src.persistence.repositories import AsyncDataRepository
+from src.persistence import AsyncDataRepository
 
 class UserRepository(AsyncDataRepository):
     pass
