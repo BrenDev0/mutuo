@@ -1,7 +1,7 @@
 import json
 from fastapi import APIRouter, Depends, Body, Response
 from uuid import uuid4
-from src.persistance import AsyncSessionRepository
+from src.persistence import AsyncSessionRepository
 from src.di import Injector, get_injector
 from ..schemas  import UserPublic
 from .schemas import CreateUserRequest

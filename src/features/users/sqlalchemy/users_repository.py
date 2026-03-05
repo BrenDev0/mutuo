@@ -1,4 +1,4 @@
-from src.persistance import AsyncSqlAlchemyDataRepository
+from src.persistence import AsyncSqlAlchemyDataRepository
 from .user_model import SqlAlchemyUser
 from ..models import User
     

@@ -1,6 +1,6 @@
 import json
 from src.security import PermissionsException, EncryptionService
-from src.persistance import AsyncSessionRepository
+from src.persistence import AsyncSessionRepository
 from ..repository import UserRepository
 from ..services import UsersService
 from .schemas import CreateUserRequest

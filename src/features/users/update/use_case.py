@@ -1,5 +1,5 @@
 from uuid import UUID
-from src.persistance import require_resource_exists
+from src.persistence import require_resource_exists
 from ..services import UsersService
 from ..schemas import UserPublic
 from ..repository import UserRepository

@@ -6,7 +6,7 @@ from src.features.users.update.use_case import UpdateUser
 from src.features.users.update.schemas import UpdateUserRequest
 from src.features.users.models import User
 from src.features.users.schemas import UserPublic
-from src.persistance import ResourceNotFoundException
+from src.persistence import ResourceNotFoundException
 from src.app import AppException
 
 
