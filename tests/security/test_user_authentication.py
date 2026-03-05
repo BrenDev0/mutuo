@@ -1,10 +1,11 @@
 import pytest
+import json
 from fastapi import HTTPException
 from uuid import UUID, uuid4
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, AsyncMock
 from fastapi import Request
 from src.security.fastapi.auth import user_authentication
-from src.security.exceptions import ExpiredToken, InvalidToken
+
 
 @pytest.fixture
 def mock_injector():
@@ -13,60 +14,94 @@ def mock_injector():
 @pytest.fixture
 def mock_request():
     request = MagicMock(spec=Request)
-    request.headers = {}
+    request.cookies = {}
     return request
 
-def test_user_authentication_valid_token(mock_request, mock_injector):
-    mock_request.headers = {"Authorization": "Bearer valid_token"}
-    mock_web_token_service = MagicMock()
-    mock_web_token_service.decode.return_value = {"user_id": uuid4()}
-    mock_injector.inject.return_value = mock_web_token_service
+@pytest.mark.asyncio
+async def test_user_authentication_valid_session(mock_request, mock_injector):
+    session_id = str(uuid4())
+    user_id = str(uuid4())
+    
+    mock_request.cookies = {"session_id": session_id}
+    
+    mock_session_repository = AsyncMock()
+    mock_session_repository.get_session.return_value = {
+        "user_id": user_id,
+        "is_authenticated": True
+    }
+    mock_injector.inject.return_value = mock_session_repository
 
-    user_id = user_authentication(mock_request, mock_injector)
-    assert isinstance(user_id, UUID)
+    result = await user_authentication(mock_request, mock_injector)
+    
+    assert isinstance(result, UUID)
+    assert str(result) == user_id
+    mock_session_repository.get_session.assert_called_once_with(session_id)
 
-def test_user_authentication_missing_auth_header(mock_request, mock_injector):
+@pytest.mark.asyncio
+async def test_user_authentication_missing_cookie(mock_request, mock_injector):
     with pytest.raises(HTTPException) as exc:
-        user_authentication(mock_request, mock_injector)
+        await user_authentication(mock_request, mock_injector)
     assert exc.value.status_code == 401
-    assert exc.value.detail == "Unautrhorized. Missing required auth headers"
+    assert exc.value.detail == "Unauthorized"
 
-def test_user_authentication_invalid_auth_header(mock_request, mock_injector):
-    mock_request.headers = {"Authorization": "InvalidHeader"}
-    with pytest.raises(HTTPException) as exc:
-        user_authentication(mock_request, mock_injector)
-    assert exc.value.status_code == 401
-    assert exc.value.detail == "Unautrhorized. Missing required auth headers"
-
-def test_user_authentication_invalid_token(mock_request, mock_injector):
-    mock_request.headers = {"Authorization": "Bearer invalid_token"}
-    mock_web_token_service = MagicMock()
-    mock_web_token_service.decode.side_effect = InvalidToken("Invalid token")
-    mock_injector.inject.return_value = mock_web_token_service
-
-    with pytest.raises(HTTPException) as exc:
-        user_authentication(mock_request, mock_injector)
-    assert exc.value.status_code == 401
-    assert exc.value.detail == "Invalid token"
-
-def test_user_authentication_expired_token(mock_request, mock_injector):
-    mock_request.headers = {"Authorization": "Bearer expired_token"}
-    mock_web_token_service = MagicMock()
-    mock_web_token_service.decode.side_effect = ExpiredToken("Token expired")
-    mock_injector.inject.return_value = mock_web_token_service
+@pytest.mark.asyncio
+async def test_user_authentication_invalid_session(mock_request, mock_injector):
+    session_id = str(uuid4())
+    mock_request.cookies = {"session_id": session_id}
+    
+    mock_session_repository = AsyncMock()
+    mock_session_repository.get_session.return_value = None
+    mock_injector.inject.return_value = mock_session_repository
 
     with pytest.raises(HTTPException) as exc:
-        user_authentication(mock_request, mock_injector)
+        await user_authentication(mock_request, mock_injector)
     assert exc.value.status_code == 401
-    assert exc.value.detail == "Token expired"
+    assert exc.value.detail == "Unauthorized"
 
-def test_user_authentication_missing_user_id(mock_request, mock_injector):
-    mock_request.headers = {"Authorization": "Bearer valid_token"}
-    mock_web_token_service = MagicMock()
-    mock_web_token_service.decode.return_value = {}
-    mock_injector.inject.return_value = mock_web_token_service
+@pytest.mark.asyncio
+async def test_user_authentication_expired_session(mock_request, mock_injector):
+    session_id = str(uuid4())
+    mock_request.cookies = {"session_id": session_id}
+    
+    mock_session_repository = AsyncMock()
+    mock_session_repository.get_session.return_value = None
+    mock_injector.inject.return_value = mock_session_repository
 
     with pytest.raises(HTTPException) as exc:
-        user_authentication(mock_request, mock_injector)
+        await user_authentication(mock_request, mock_injector)
     assert exc.value.status_code == 401
-    assert exc.value.detail == "Invalid token"
+    assert exc.value.detail == "Unauthorized"
+
+@pytest.mark.asyncio
+async def test_user_authentication_missing_user_id(mock_request, mock_injector):
+    session_id = str(uuid4())
+    mock_request.cookies = {"session_id": session_id}
+    
+    mock_session_repository = AsyncMock()
+    mock_session_repository.get_session.return_value = {
+        "is_authenticated": True
+    }
+    mock_injector.inject.return_value = mock_session_repository
+
+    with pytest.raises(HTTPException) as exc:
+        await user_authentication(mock_request, mock_injector)
+    assert exc.value.status_code == 401
+    assert exc.value.detail == "Unauthorized"
+
+@pytest.mark.asyncio
+async def test_user_authentication_not_authenticated(mock_request, mock_injector):
+    session_id = str(uuid4())
+    user_id = str(uuid4())
+    mock_request.cookies = {"session_id": session_id}
+    
+    mock_session_repository = AsyncMock()
+    mock_session_repository.get_session.return_value = {
+        "user_id": user_id,
+        "is_authenticated": False
+    }
+    mock_injector.inject.return_value = mock_session_repository
+
+    with pytest.raises(HTTPException) as exc:
+        await user_authentication(mock_request, mock_injector)
+    assert exc.value.status_code == 401
+    assert exc.value.detail == "Unauthorized"

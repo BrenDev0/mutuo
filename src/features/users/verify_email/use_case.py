@@ -1,7 +1,8 @@
 from pathlib import Path
 import os
-from src.security import get_random_code, WebTokenService, EncryptionService
-from src.persistance import CollisionException
+import json
+from src.security import get_random_code, EncryptionService, HashingService
+from src.persistance import CollisionException, AsyncSessionRepository
 from src.communications import Email, EmailService
 from ..rules import EmailAvailability
 
@@ -9,8 +10,9 @@ class VerifyEmail:
     """Send verification code to users email for user registration"""
     def __init__(
         self,
-        web_token: WebTokenService,
         encryption: EncryptionService,
+        hashing: HashingService,
+        session_repository: AsyncSessionRepository,
         email_service: EmailService,
         email_availible_rule: EmailAvailability
     ):
@@ -24,8 +26,10 @@ class VerifyEmail:
 
         self._email_service = email_service
         self._email_available_rule = email_availible_rule
-        self._web_token = web_token
+        
         self._encryption = encryption
+        self._hashing = hashing
+        self._session_repository = session_repository
 
     def __build_email( 
         self,
@@ -72,7 +76,9 @@ class VerifyEmail:
         Raises:
             CollisionException: If email is already in use
         """
-        email_available = await self._email_available_rule.validate(email=to)
+        email_hash = self._hashing.hash_for_search(data=to)
+        email_available = await self._email_available_rule.validate(email_hash=email_hash)
+
         if not email_available:
             raise CollisionException(
                 detail="Email in use",
@@ -90,16 +96,16 @@ class VerifyEmail:
             email=email
         )
 
-        token_payload = {
-            "verification_code": self._encryption.encrypt(verification_code)
+        session_data = {
+            "verification_code": self._encryption.encrypt(verification_code),
+            "attempts": 0
         }
 
-        token = self._web_token.generate(
-            payload=token_payload,
-            expiration=900 # 15 minutes for verification tokens
+        await self._session_repository.set_session(
+            key=f"verification:{email_hash}",
+            value=json.dumps(session_data),
+            expire_seconds=900
         )
-
-        return token
 
         
         

@@ -1,24 +1,44 @@
-from fastapi import APIRouter, Request, Depends, Body
+from fastapi import APIRouter, Request, Depends, Body, Response
 from src.di import Injector, get_injector
-from src.security import user_verification
 from ..schemas  import UserPublic
-from .schemas import CreateUserRequest
+from .schemas import CreateUserRequest, CreateUserResult
 from .use_case import CreateUser
+from ..config import SESSION_EXPIRATION
 
 router = APIRouter(
     tags=["Users"]
 )
 
-@router.post("/", status_code=200, response_model=UserPublic)
+@router.post("/", status_code=201, response_model=UserPublic)
 async def create_user(
-    request: Request,
+    response: Response,
     data: CreateUserRequest = Body(...),
-    verification_code: int = Depends(user_verification),
     injector: Injector = Depends(get_injector)
 ):
+    """
+    Create user 
+
+    verification code must come from users email 
+
+    raises:
+        429: if max atteps have been reached must request new code to try again
+        401: if verification fails 
+
+    """
     use_case: CreateUser = injector.inject(CreateUser)  
-    return await use_case.execute(
+    result: CreateUserResult = await use_case.execute(
         data=data,
-        verification_code=verification_code,
-        profile_type="OWNER"
+        session_expiration=SESSION_EXPIRATION
     )
+
+    response.set_cookie(
+        key="session_id",
+        value=str(result.session_id),
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=SESSION_EXPIRATION
+    )
+
+
+    return result.user_public

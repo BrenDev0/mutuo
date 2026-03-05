@@ -32,8 +32,7 @@ class UsersService:
     
     def prepare_new_user_data(
         self,
-        data: CreateUserRequest,
-        profile_type: str
+        data: CreateUserRequest
     ) -> User:
         encrypted_email = self.__encryption.encrypt(data.email)
         encrypted_name = self.__encryption.encrypt(data.name)
@@ -47,7 +46,7 @@ class UsersService:
             phone=encrypted_phone,
             email=encrypted_email,
             email_hash=hashed_email,
-            profile_type=profile_type,
+            profile_type=data.profile_type,
             password=hashed_password
         )
 
@@ -56,14 +55,12 @@ class UsersService:
 class EmailAvailabilityService(EmailAvailability):
     def __init__(
         self,
-        hashing: HashingService,
         users_repository: UserRepository
     ):
-        self._hashing = hashing
         self._users_repository = users_repository
 
     
-    async def validate(self, email: str) -> bool:
+    async def validate(self, email_hash: str) -> bool:
         """
         Check if email is available for registration.
         
@@ -73,11 +70,10 @@ class EmailAvailabilityService(EmailAvailability):
         Returns:
             True if email is available (not in use), False if already exists.
         """
-        hashed_email = self._hashing.hash_for_search(email)
 
         email_in_use = await self._users_repository.select_one(
             key="email_hash",
-            value=hashed_email
+            value=email_hash
         )
 
         return email_in_use is None

@@ -7,7 +7,7 @@ class EmailAvailability(ABC):
     @abstractmethod
     async def validate(
         self, 
-        email: str
+        email_hash: str
     ) -> bool:
         """
         check if users email is avalailible

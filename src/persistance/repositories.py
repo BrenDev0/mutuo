@@ -75,3 +75,20 @@ class AsyncDataRepository(ABC, Generic[E, M]):
         value: Union[str, int, UUID]
     ) -> List[E] | None:
         raise NotImplementedError
+
+
+
+class AsyncSessionRepository(ABC):
+    @abstractmethod
+    async def set_session(self, key: str, value: str, expire_seconds: Optional[int] = 3600) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_session(self, key: str) -> Dict[str, Any] | None:
+        raise NotImplementedError
+    
+    @abstractmethod
+    async def delete_session(self, key: str) -> bool:
+        raise NotImplementedError
+    
+  
