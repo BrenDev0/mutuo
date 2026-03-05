@@ -1,10 +1,9 @@
 import pytest
-import json
 from unittest.mock import Mock, AsyncMock
 from datetime import datetime
 from uuid import uuid4
 from src.features.users.create.use_case import CreateUser
-from src.features.users.create.schemas import CreateUserRequest, CreateUserResult
+from src.features.users.create.schemas import CreateUserRequest
 from src.features.users.services import UsersService
 from src.features.users.models import User
 from src.features.users.schemas import UserPublic
@@ -52,7 +51,6 @@ async def test_success(
 ):
     user_id = uuid4()
     verification_code = 123456
-    session_expiration = 259200
     
     fake_user = User(
         user_id=user_id,
@@ -103,10 +101,7 @@ async def test_success(
 
     mock_users_repository.create.return_value = fake_user
 
-    result = await use_case.execute(
-        data=fake_request_data,
-        session_expiration=session_expiration
-    )
+    result = await use_case.execute(data=fake_request_data)
 
     mock_users_service.prepare_new_user_data.assert_called_once_with(
         data=fake_request_data
@@ -122,9 +117,8 @@ async def test_success(
     
     mock_users_service.get_public_schema.assert_called_once_with(fake_user)
 
-    assert isinstance(result, CreateUserResult)
-    assert result.user_public == fake_public_schema
-    assert result.session_id is not None
+    assert isinstance(result, UserPublic)
+    assert result == fake_public_schema
 
 
 @pytest.mark.asyncio
@@ -156,10 +150,7 @@ async def test_verification_code_not_found(
     mock_session_repository.get_session.return_value = None
 
     with pytest.raises(PermissionsException) as exc_info:
-        await use_case.execute(
-            data=fake_request_data,
-            session_expiration=259200
-        )
+        await use_case.execute(data=fake_request_data)
     
     assert exc_info.value.detail == "Verification code expired or not found"
     assert exc_info.value.status_code == 401
@@ -202,10 +193,7 @@ async def test_verification_code_mismatch(
     mock_encryption.decrypt.return_value = "123456"
 
     with pytest.raises(PermissionsException) as exc_info:
-        await use_case.execute(
-            data=fake_request_data,
-            session_expiration=259200
-        )
+        await use_case.execute(data=fake_request_data)
     
     assert exc_info.value.detail == "Verification failed"
     assert exc_info.value.status_code == 401
@@ -248,10 +236,7 @@ async def test_too_many_attempts(
     }
 
     with pytest.raises(PermissionsException) as exc_info:
-        await use_case.execute(
-            data=fake_request_data,
-            session_expiration=259200
-        )
+        await use_case.execute(data=fake_request_data)
     
     assert exc_info.value.detail == "Limit reached please request new code"
     assert exc_info.value.status_code == 429

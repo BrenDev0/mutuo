@@ -1,7 +1,10 @@
+import json
 from fastapi import APIRouter, Depends, Body, Response
+from uuid import uuid4
+from src.persistance import AsyncSessionRepository
 from src.di import Injector, get_injector
 from ..schemas  import UserPublic
-from .schemas import CreateUserRequest, CreateUserResult
+from .schemas import CreateUserRequest
 from .use_case import CreateUser
 from ..config import SESSION_EXPIRATION
 
@@ -28,14 +31,28 @@ async def create_user(
 
     """
     use_case: CreateUser = injector.inject(CreateUser)  
-    result: CreateUserResult = await use_case.execute(
-        data=data,
-        session_expiration=SESSION_EXPIRATION
+    user = await use_case.execute(
+        data=data
+    )
+
+    session_repository: AsyncSessionRepository = injector.inject(AsyncSessionRepository)
+    
+    session_id = uuid4()
+    
+    session_data = {
+        "user_id": str(user.user_id),
+        "is_authenticated": True
+    }
+    
+    await session_repository.set_session(
+        key=str(session_id),
+        value=json.dumps(session_data),
+        expire_seconds=SESSION_EXPIRATION
     )
 
     response.set_cookie(
         key="session_id",
-        value=str(result.session_id),
+        value=str(session_id),
         httponly=True,
         secure=True,
         samesite="lax",
@@ -43,4 +60,4 @@ async def create_user(
     )
 
 
-    return result.user_public
+    return user

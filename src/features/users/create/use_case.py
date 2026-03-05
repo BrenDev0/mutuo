@@ -1,11 +1,11 @@
 import json
-from uuid import uuid4
 from src.security import PermissionsException, EncryptionService
 from src.persistance import AsyncSessionRepository
 from ..repository import UserRepository
 from ..services import UsersService
-from .schemas import CreateUserRequest, CreateUserResult
+from .schemas import CreateUserRequest
 from ..models import User
+from ..schemas import UserPublic
 
 class CreateUser:
     def __init__(
@@ -24,9 +24,8 @@ class CreateUser:
 
     async def execute(
         self,
-        data: CreateUserRequest,
-        session_expiration: int
-    ):
+        data: CreateUserRequest
+    ) -> UserPublic:
         partial_entity = self._users_service.prepare_new_user_data(
             data=data
         )
@@ -66,20 +65,6 @@ class CreateUser:
             data=partial_entity
         )
 
-        session_id = uuid4()
-        session_data = {
-            "user_id": str(entity.user_id),
-            "is_authenticated": True
-        }
-        await self._session_repository.set_session(
-            key=str(session_id),
-            value=json.dumps(session_data),
-            expire_seconds=session_expiration
-        )
+        return self._users_service.get_public_schema(entity)
 
-        public_schema = self._users_service.get_public_schema(entity)
-
-        return CreateUserResult(
-            user_public=public_schema,
-            session_id=session_id
-        )
+       

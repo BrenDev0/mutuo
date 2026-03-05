@@ -1,6 +1,4 @@
-from uuid import UUID
-from pydantic import BaseModel
-from ..schemas import UserConfig, UserPublic
+from ..schemas import UserConfig
 
 class CreateUserRequest(UserConfig):
     verification_code: int
@@ -9,8 +7,4 @@ class CreateUserRequest(UserConfig):
     email: str
     password: str
     profile_type: str
-
-class CreateUserResult(BaseModel):
-    user_public: UserPublic
-    session_id: UUID
 
