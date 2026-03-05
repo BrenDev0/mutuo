@@ -1,7 +1,7 @@
-from src.persistance.sqlalchemy.setup import get_async_engine
+from src.persistence.sqlalchemy.setup import get_async_engine
 import logging
 
-from src.persistance.sqlalchemy.setup import SqlAlchemyBase
+from src.persistence.sqlalchemy.setup import SqlAlchemyBase
 from src.features.users.sqlalchemy.user_model import SqlAlchemyUser # noqa: F401
 logger = logging.getLogger(__name__)
 

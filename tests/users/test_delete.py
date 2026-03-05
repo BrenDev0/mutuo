@@ -6,7 +6,7 @@ from src.features.users.delete.use_case import DeleteUser
 from src.features.users.services import UsersService
 from src.features.users.models import User
 from src.features.users.schemas import UserPublic
-from src.persistance import ResourceNotFoundException
+from src.persistence import ResourceNotFoundException
 
 
 @pytest.fixture

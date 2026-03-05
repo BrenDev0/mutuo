@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 import json
 from src.security import get_random_code, EncryptionService, HashingService
-from src.persistance import CollisionException, AsyncSessionRepository
+from src.persistence import CollisionException, AsyncSessionRepository
 from src.communications import Email, EmailService
 from ..rules import EmailAvailability
 

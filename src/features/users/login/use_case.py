@@ -1,9 +1,9 @@
 import json
 from uuid import uuid4
 from src.security import HashingService, IncorrectPassword
-from src.persistance import ResourceNotFoundException
+from src.persistence import ResourceNotFoundException
 from typing import cast
-from src.persistance import AsyncSessionRepository
+from src.persistence import AsyncSessionRepository
 from ..repository import UserRepository
 from ..models import User
 from ..services import UsersService

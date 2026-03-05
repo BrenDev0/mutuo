@@ -1,7 +1,7 @@
 from fastapi import Request, HTTPException, Depends
 from uuid import UUID
 from src.di import get_injector, Injector
-from src.persistance import AsyncSessionRepository
+from src.persistence import AsyncSessionRepository
 
 async def user_authentication(
     request: Request,

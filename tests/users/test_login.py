@@ -6,7 +6,7 @@ from src.features.users.login.use_case import UserLogin
 from src.features.users.login.schemas import LoginResult
 from src.features.users.models import User
 from src.features.users.schemas import UserPublic
-from src.persistance import ResourceNotFoundException
+from src.persistence import ResourceNotFoundException
 from src.security import IncorrectPassword
 
 @pytest.fixture
