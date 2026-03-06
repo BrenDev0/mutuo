@@ -67,7 +67,7 @@ def create_fastapi_app():
         ## Health check 
         This endpoints verifies server status.
         """
-        return {"status": "Renters ok"}
+        return {"status": "Mutuo ok"}
     
     api_router = APIRouter(
         prefix="/api/v1"
