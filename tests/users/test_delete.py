@@ -3,7 +3,6 @@ from unittest.mock import Mock, AsyncMock, patch
 from datetime import datetime
 from uuid import uuid4
 from src.features.users.delete.use_case import DeleteUser
-from src.features.users.services import UsersService
 from src.features.users.models import User
 from src.features.users.schemas import UserPublic
 from src.persistence import ResourceNotFoundException
