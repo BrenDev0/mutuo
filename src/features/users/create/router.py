@@ -23,6 +23,8 @@ async def create_user(
 
     Verification code must come from users email 
 
+    ProfileType must be either 'OWNER' or 'RENTER' anything else will raise a 422 error
+
     Raises:
     
     &emsp;429: If max attempts have been reached, must request new code to try again
