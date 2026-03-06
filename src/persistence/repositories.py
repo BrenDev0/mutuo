@@ -10,7 +10,7 @@ class AsyncDataRepository(ABC, Generic[E, M]):
     @abstractmethod
     async def create(
         self, 
-        data: E
+        entity: E
     ) -> E:
         raise NotImplementedError
 

@@ -53,6 +53,7 @@ async def create_user(
     response.set_cookie(
         key="session_id",
         value=str(session_id),
+        path="/",
         httponly=True,
         secure=True,
         samesite="lax",

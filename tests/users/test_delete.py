@@ -20,13 +20,20 @@ def mock_users_service():
 
 
 @pytest.fixture
+def mock_session_repository():
+    return AsyncMock()
+
+
+@pytest.fixture
 def use_case(
     mock_users_repository,
-    mock_users_service
+    mock_users_service,
+    mock_session_repository
 ):
     return DeleteUser(
         users_repository=mock_users_repository,
-        users_service=mock_users_service
+        users_service=mock_users_service,
+        session_repository=mock_session_repository
     )
 
 
@@ -35,10 +42,12 @@ def use_case(
 async def test_delete_user_success(
     mock_require_exists,
     mock_users_repository,
-    mock_users_service: UsersService,
+    mock_users_service,
+    mock_session_repository,
     use_case: DeleteUser
 ):
     user_id = uuid4()
+    session_id = uuid4()
     
     fake_deleted_user = User(
         user_id=user_id,
@@ -64,7 +73,7 @@ async def test_delete_user_success(
     mock_users_repository.delete_one.return_value = fake_deleted_user
     mock_users_service.get_public_schema.return_value = fake_public_schema
 
-    result = await use_case.execute(user_id=user_id)
+    result = await use_case.execute(session_id=session_id, user_id=user_id)
 
     mock_require_exists.assert_called_once_with(
         repository=mock_users_repository,
@@ -75,6 +84,10 @@ async def test_delete_user_success(
     mock_users_repository.delete_one.assert_called_once_with(
         key="user_id",
         value=user_id
+    )
+    
+    mock_session_repository.delete_session.assert_called_once_with(
+        key=str(session_id)
     )
     
     mock_users_service.get_public_schema.assert_called_once_with(entity=fake_deleted_user)
@@ -92,17 +105,19 @@ async def test_delete_user_success(
 async def test_delete_user_not_found(
     mock_require_exists,
     mock_users_repository,
-    mock_users_service: UsersService,
+    mock_users_service,
+    mock_session_repository,
     use_case: DeleteUser
 ):
     user_id = uuid4()
+    session_id = uuid4()
 
     mock_require_exists.side_effect = ResourceNotFoundException(
         detail=f"Resource with user_id: {user_id} not found"
     )
 
     with pytest.raises(ResourceNotFoundException) as exc_info:
-        await use_case.execute(user_id=user_id)
+        await use_case.execute(session_id=session_id, user_id=user_id)
     
     assert f"Resource with user_id: {user_id} not found" in str(exc_info.value)
     
@@ -113,6 +128,7 @@ async def test_delete_user_not_found(
     )
     
     mock_users_repository.delete_one.assert_not_called()
+    mock_session_repository.delete_session.assert_not_called()
     mock_users_service.get_public_schema.assert_not_called()
 
 
@@ -121,10 +137,12 @@ async def test_delete_user_not_found(
 async def test_delete_user_repository_error(
     mock_require_exists,
     mock_users_repository,
-    mock_users_service: UsersService,
+    mock_users_service,
+    mock_session_repository,
     use_case: DeleteUser
 ):
     user_id = uuid4()
+    session_id = uuid4()
     
     fake_user = User(
         user_id=user_id,
@@ -141,7 +159,7 @@ async def test_delete_user_repository_error(
     mock_users_repository.delete_one.side_effect = Exception("Database error")
 
     with pytest.raises(Exception) as exc_info:
-        await use_case.execute(user_id=user_id)
+        await use_case.execute(session_id=session_id, user_id=user_id)
     
     assert "Database error" in str(exc_info.value)
     
@@ -156,4 +174,5 @@ async def test_delete_user_repository_error(
         value=user_id
     )
     
+    mock_session_repository.delete_session.assert_not_called()
     mock_users_service.get_public_schema.assert_not_called()

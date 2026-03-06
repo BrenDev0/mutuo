@@ -3,6 +3,9 @@ import hashlib
 from ..services import HashingService
 
 class BcryptHashingService(HashingService):
+    def __init__(self):
+        pass
+
     def hash_for_search(self, data: str) -> str:
         email_bytes = data.lower().encode('utf-8')  
         hashed_data = hashlib.sha256(email_bytes).hexdigest()

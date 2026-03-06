@@ -48,7 +48,7 @@ class UsersService:
             phone=encrypted_phone,
             email=encrypted_email,
             email_hash=hashed_email,
-            profile_type=data.profile_type,
+            profile_type=data.profile_type.upper(),
             password=hashed_password
         )
 

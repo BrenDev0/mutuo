@@ -44,9 +44,10 @@ class AsyncSqlAlchemyDataRepository(AsyncDataRepository[E, M]):
         async with self.__session_factory() as session:
             stmt = select(self.__model).where(getattr(self.__model, key) == value)
 
-            result = await session.execute(stmt).scalar_one_or_none()
+            result = await session.execute(stmt)
+            model = result.scalar_one_or_none()
 
-            return self._to_entity(result) if result else None
+            return self._to_entity(model) if model else None
 
 
     async def select_many(
@@ -65,10 +66,11 @@ class AsyncSqlAlchemyDataRepository(AsyncDataRepository[E, M]):
             if offset:
                 stmt.offset(offset)
 
-            result = await session.execute(stmt).scalars().all()
+            result = await session.execute(stmt)
+            models = result.scalars().all()
 
             return [
-                self._to_entity(row) for row in result 
+                self._to_entity(model) for model in models 
             ] if result else None
 
     async def select_all(
@@ -103,11 +105,12 @@ class AsyncSqlAlchemyDataRepository(AsyncDataRepository[E, M]):
             try:
                 stmt = update(self.__model).where(getattr(self.__model, key) == value).values(**changes).returning(self.__model)
 
-                result = await session.execute(stmt).scalar_one_or_none()
+                result = await session.execute(stmt)
+                model = result.scalar_one_or_none()
 
                 await session.commit()
 
-                return self._to_entity(result)
+                return self._to_entity(model)
             
             except Exception as e:
                 logger.error(f"Error updating {self.__model.__name__}: {e}", exc_info=True)
@@ -124,12 +127,13 @@ class AsyncSqlAlchemyDataRepository(AsyncDataRepository[E, M]):
             async with self.__session_factory() as session:
                 stmt = update(self.__model).where(getattr(self.__model, key) == value).values(**changes).returning(self.__model)
 
-                result = await session.execute(stmt).scalars().all()
+                result = await session.execute(stmt)
+                models = result.scalars().all()
 
                 await session.commit()
 
                 return [
-                    self._to_entity(row) for row in result
+                    self._to_entity(model) for model in models
                 ]
         
         except Exception as e:
@@ -144,13 +148,14 @@ class AsyncSqlAlchemyDataRepository(AsyncDataRepository[E, M]):
     ) -> E:
         try:
             async with self.__session_factory() as session:
-                stmt = delete(self.__model).where(getattr(self.__model, key) == value)
+                stmt = delete(self.__model).where(getattr(self.__model, key) == value).returning(self.__model)
 
-                result = await session.execute(stmt).scalar_one_or_none()
+                result = await session.execute(stmt)
+                model = result.scalar_one_or_none()
 
                 await session.commit()
 
-                return self._to_entity(result)
+                return self._to_entity(model)
         
         except Exception as e:
             logger.error(f"Error deleting {self.__model.__name__}: {e}", exc_info=True)
@@ -164,14 +169,15 @@ class AsyncSqlAlchemyDataRepository(AsyncDataRepository[E, M]):
     ) -> List[E]:
         try:
             async with self.__session_factory() as session:
-                stmt = delete(self.__model).where(getattr(self.__model, key) == value)
+                stmt = delete(self.__model).where(getattr(self.__model, key) == value).returning(self.__model)
 
-                result = await session.execute(stmt).scalars().all()
+                result = await session.execute(stmt)
+                models = result.scalars().all()
 
                 await session.commit()
 
                 return [
-                    self._to_entity(row) for row in result
+                    self._to_entity(model) for model in models
                 ]
         
         except Exception as e:

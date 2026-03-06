@@ -1,6 +1,6 @@
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from src.di.injector import Injector
@@ -26,7 +26,7 @@ def create_fastapi_app():
     # CORS setup
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:4200", "http://localhost:8000"],
+        allow_origins=["http://localhost:3000", "http://localhost:8000"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -37,7 +37,11 @@ def create_fastapi_app():
         print(str(exc))
         return JSONResponse(
             status_code=int(exc.status_code),
-            content={"detaile": str(exc.detail)}
+            content={"detail": [
+                {
+                    "msg": str(exc.detail)
+                }
+            ]}
         )
     
 
@@ -47,7 +51,11 @@ def create_fastapi_app():
         print(str(exc))
         return JSONResponse(
             status_code=500,
-            content={"detail": "Unable to process request at this time"}
+            content={"detail": [
+                {
+                    "msg": "Unable to process request at this time"
+                }
+            ]}
         )
     
     
@@ -61,8 +69,13 @@ def create_fastapi_app():
         """
         return {"status": "Renters ok"}
     
+    api_router = APIRouter(
+        prefix="/api/v1"
+    )
 
-    app.include_router(user_routes.router)
+    api_router.include_router(user_routes.router)
+
+    app.include_router(api_router)
 
     return app
     

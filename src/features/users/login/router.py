@@ -27,6 +27,7 @@ async def user_login(
     response.set_cookie(
         key="session_id",
         value=str(result.session_id),
+        path="/",
         httponly=True,
         secure=True,
         samesite="lax",

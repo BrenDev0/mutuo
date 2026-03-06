@@ -62,7 +62,7 @@ class CreateUser:
         )
 
         entity: User = await self._users_repository.create(
-            data=partial_entity
+            entity=partial_entity
         )
 
         return self._users_service.get_public_schema(entity)
