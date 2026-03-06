@@ -58,7 +58,7 @@ async def test_success(
         phone="encrypted",
         email="hashed",
         email_hash="hashed_email",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed",
         created_at=datetime.now()
     )
@@ -69,7 +69,7 @@ async def test_success(
         phone="phone",
         email="email",
         password="password",
-        profile_type="OWNER"
+        profile_type="PROPIETARIO"
     )
 
     fake_public_schema = UserPublic(
@@ -77,7 +77,7 @@ async def test_success(
         name="decrypted",
         phone="decrypted",
         email="decrypted",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         created_at=datetime.now()
     )
 
@@ -86,7 +86,7 @@ async def test_success(
         phone="encrypted",
         email="hashed",
         email_hash="hashed_email",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed",
     )
 
@@ -135,7 +135,7 @@ async def test_verification_code_not_found(
         phone="phone",
         email="email",
         password="password",
-        profile_type="OWNER"
+        profile_type="PROPIETARIO"
     )
 
     mock_users_service.prepare_new_user_data.return_value = User(
@@ -143,7 +143,7 @@ async def test_verification_code_not_found(
         phone="encrypted",
         email="hashed",
         email_hash="hashed_email",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed",
     )
 
@@ -173,7 +173,7 @@ async def test_verification_code_mismatch(
         phone="phone",
         email="email",
         password="password",
-        profile_type="OWNER"
+        profile_type="PROPIETARIO"
     )
 
     mock_users_service.prepare_new_user_data.return_value = User(
@@ -181,7 +181,7 @@ async def test_verification_code_mismatch(
         phone="encrypted",
         email="hashed",
         email_hash="hashed_email",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed",
     )
 
@@ -218,7 +218,7 @@ async def test_too_many_attempts(
         phone="phone",
         email="email",
         password="password",
-        profile_type="OWNER"
+        profile_type="PROPIETARIO"
     )
 
     mock_users_service.prepare_new_user_data.return_value = User(
@@ -226,7 +226,7 @@ async def test_too_many_attempts(
         phone="encrypted",
         email="hashed",
         email_hash="hashed_email",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed",
     )
 

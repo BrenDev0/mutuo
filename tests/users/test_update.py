@@ -44,7 +44,7 @@ async def test_success(
         phone="encrypted_phone",
         email="hashed_email",
         email_hash="hashed_email_hash",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed_password",
         created_at=datetime.now()
     )
@@ -54,7 +54,7 @@ async def test_success(
         name="decrypted_updated_name",
         phone="decrypted_phone",
         email="decrypted_email",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         created_at=datetime.now()
     )
 
@@ -151,7 +151,7 @@ async def test_no_fields_to_update(
         phone="encrypted_phone",
         email="hashed_email",
         email_hash="hashed_email_hash",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed_password",
         created_at=datetime.now()
     )
@@ -205,7 +205,7 @@ async def test_update_multiple_fields(
         phone="encrypted_new_phone",
         email="hashed_email",
         email_hash="hashed_email_hash",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed_password",
         created_at=datetime.now()
     )
@@ -215,7 +215,7 @@ async def test_update_multiple_fields(
         name="decrypted_new_name",
         phone="decrypted_new_phone",
         email="decrypted_email",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         created_at=datetime.now()
     )
 
@@ -269,7 +269,7 @@ async def test_update_only_name(
         phone="encrypted_original_phone",
         email="hashed_email",
         email_hash="hashed_email_hash",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed_password",
         created_at=datetime.now()
     )
@@ -279,7 +279,7 @@ async def test_update_only_name(
         name="decrypted_new_name",
         phone="decrypted_original_phone",
         email="decrypted_email",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         created_at=datetime.now()
     )
 

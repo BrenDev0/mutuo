@@ -23,7 +23,7 @@ async def create_user(
 
     Verification code must come from users email 
 
-    ProfileType must be either 'OWNER' or 'RENTER' anything else will raise a 422 error
+    ProfileType must be either 'PROPIETARIO' or 'INQUILINO' anything else will raise a 422 error
 
     Raises:
     
