@@ -1,4 +1,5 @@
 from ..schemas import UserConfig
+from ..models import ProfileType
 
 class CreateUserRequest(UserConfig):
     verification_code: int
@@ -6,5 +7,5 @@ class CreateUserRequest(UserConfig):
     phone: str
     email: str
     password: str
-    profile_type: str
+    profile_type: ProfileType
 
