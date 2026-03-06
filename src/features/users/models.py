@@ -5,8 +5,8 @@ from typing import Optional
 from enum import Enum
 
 class ProfileType(Enum):
-    OWNER = "OWNER"
-    RENTER = "RENTER"
+    OWNER = "PROPIETARIO"
+    RENTER = "	INQUILINO"
 
 class User(BaseModel):
     user_id: Optional[UUID] = None

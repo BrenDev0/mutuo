@@ -54,7 +54,7 @@ async def test_success(
         phone="encrypted",
         email="hashed",
         email_hash="hashedfs",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed",
         created_at=datetime.now()
     )
@@ -64,7 +64,7 @@ async def test_success(
         name="decrytpted",
         phone="decrytpted",
         email="email",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         created_at=datetime.now()
     )
     mock_hashing.hash_for_search.return_value = "hashed_for_search"
@@ -131,7 +131,7 @@ async def test_incorrect_password(
         phone="encrypted",
         email="hashed",
         email_hash="hashedfs",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed",
         created_at=datetime.now()
     )

@@ -54,7 +54,7 @@ async def test_delete_user_success(
         phone="encrypted",
         email="hashed",
         email_hash="hashed",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed",
         created_at=datetime.now()
     )
@@ -64,7 +64,7 @@ async def test_delete_user_success(
         name="decrypted",
         phone="decrypted",
         email="decrypted",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         created_at=datetime.now()
     )
 
@@ -96,7 +96,7 @@ async def test_delete_user_success(
     assert result.name == "decrypted"
     assert result.phone == "decrypted"
     assert result.email == "decrypted"
-    assert result.profile_type == "OWNER"
+    assert result.profile_type == "PROPIETARIO"
 
 
 @pytest.mark.asyncio
@@ -149,7 +149,7 @@ async def test_delete_user_repository_error(
         phone="encrypted",
         email="hashed",
         email_hash="hashed",
-        profile_type="OWNER",
+        profile_type="PROPIETARIO",
         password="hashed",
         created_at=datetime.now()
     )
